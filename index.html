@@ -122,6 +122,7 @@ body {
 .connection-status.online { background: rgba(56, 161, 105, 0.15); color: #9ae6b4; }
 .connection-status.offline { background: rgba(229, 62, 62, 0.15); color: #feb2b2; }
 .connection-status.syncing { background: rgba(49, 130, 206, 0.15); color: #90cdf4; }
+.connection-status.error { background: rgba(229, 62, 62, 0.15); color: #feb2b2; }
 .status-dot {
     width: 8px;
     height: 8px;
@@ -132,6 +133,7 @@ body {
 .connection-status.online .status-dot { background: #38a169; }
 .connection-status.offline .status-dot { background: #e53e3e; }
 .connection-status.syncing .status-dot { background: #3182ce; }
+.connection-status.error .status-dot { background: #e53e3e; }
 @keyframes pulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.5; }
@@ -2680,9 +2682,9 @@ form {
                 <br>
                 🕐 <strong>ساعات العمل:</strong> من 11:00 صباحًا حتى 7:00 مساءً (يمكن تعديلها لكل سجل)
                 <br>
-                📅 <strong>اختر الشهر (اختياري):</strong>
+                📅 <strong>شهر التصدير:</strong>
                 <input type="month" id="excelMonthFilter" style="margin-right: 10px; padding: 6px 10px; border: 1px solid #c9a961; border-radius: 6px; font-family: inherit;">
-                <span style="font-size:12px;color:#718096;">(اتركه فارغاً لتصدير كل الفترات)</span>
+                <span style="font-size:12px;color:#718096;">(الشهر الحالي افتراضيًا، وافرغ الخانة لتصدير كل الفترات)</span>
             </div>
             <div class="table-wrapper">
                 <table class="data-table">
@@ -2911,13 +2913,14 @@ form {
                             <th>وقت الحضور</th>
                             <th>وقت الانصراف</th>
                             <th>ساعات العمل</th>
+                            <th>مدة التأخر</th>
                             <th>الحالة</th>
                             <th>ملاحظات</th>
                             <th>إجراءات</th>
                         </tr>
                     </thead>
                     <tbody id="attendanceTable">
-                        <tr><td colspan="9" class="empty-state">لا توجد سجلات حضور</td></tr>
+                        <tr><td colspan="10" class="empty-state">لا توجد سجلات حضور</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -3804,7 +3807,6 @@ window.updateCustomColor = updateCustomColor;
 window.resetCustomColors = resetCustomColors;
 window.applyColorPalette = applyColorPalette;
 window.notifyCustomColorSaved = notifyCustomColorSaved;
-
 // ====== التخزين والإعدادات الأساسية ======
 const STORAGE_KEYS = {
     employees: 're_employees',
@@ -3923,16 +3925,62 @@ function calcWorkHours(checkIn, checkOut) {
     return hours.toFixed(2);
 }
 
+function getAttendanceLateMinutes(attendance, scheduledCheckIn = getAppSettings().checkIn) {
+    if (attendance && (attendance.status === 'غائب' || attendance.status === 'إجازة' || attendance.status === 'مأمورية')) {
+        return 0;
+    }
+    if (!attendance || !/^\d{2}:\d{2}$/.test(attendance.checkIn || '') || !/^\d{2}:\d{2}$/.test(scheduledCheckIn || '')) {
+        return 0;
+    }
+    const toMinutes = time => {
+        const [hours, minutes] = time.split(':').map(Number);
+        return hours * 60 + minutes;
+    };
+    return Math.max(0, toMinutes(attendance.checkIn) - toMinutes(scheduledCheckIn));
+}
+
+function getAttendanceStatus(attendance) {
+    if (attendance.status === 'غائب' || attendance.status === 'إجازة' || attendance.status === 'مأمورية') {
+        return attendance.status;
+    }
+    return attendance.status === 'تأخر' || getAttendanceLateMinutes(attendance) > 0
+        ? 'تأخر'
+        : attendance.status;
+}
+
+function formatLateDuration(minutes) {
+    if (!minutes) return '-';
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    if (!hours) return `${remainingMinutes} دقيقة`;
+    if (!remainingMinutes) return `${hours} ساعة`;
+    return `${hours} ساعة و ${remainingMinutes} دقيقة`;
+}
+
 // ====== حالة الاتصال ======
 function updateConnectionStatus(status, message) {
     const el = document.getElementById('connectionStatus');
     const txt = document.getElementById('connectionText');
-    el.classList.remove('online', 'offline', 'syncing');
+    el.classList.remove('online', 'offline', 'syncing', 'error');
     el.classList.add(status);
     txt.textContent = message;
-    el.title = status === 'offline'
-        ? 'سيتم حفظ تغييراتك على هذا الجهاز ورفعها تلقائيًا عند عودة الاتصال'
-        : 'تتم مزامنة تغييراتك مع السحابة تلقائيًا';
+    if (status === 'offline') {
+        el.title = 'سيتم حفظ تغييراتك على هذا الجهاز ورفعها تلقائيًا عند عودة الاتصال';
+    } else if (status === 'error') {
+        el.title = 'اتصال الإنترنت موجود، لكن صلاحيات Firebase تمنع مزامنة البيانات';
+    } else {
+        el.title = 'تتم مزامنة تغييراتك مع السحابة تلقائيًا';
+    }
+}
+
+function getFirebaseAccessErrorMessage(error) {
+    if (error?.code === 'permission-denied') {
+        return 'اتصال الإنترنت يعمل، لكن صلاحيات Firestore تمنع الوصول. راجع قواعد الأمان أو إعداد تسجيل الدخول في Firebase.';
+    }
+    if (error?.code === 'unauthenticated') {
+        return 'اتصال الإنترنت يعمل، لكن Firebase يتطلب تسجيل الدخول قبل مزامنة البيانات.';
+    }
+    return null;
 }
 
 function setupConnectionListeners() {
@@ -4032,6 +4080,7 @@ async function processSyncQueue() {
 
     isSyncing = true;
     updateConnectionStatus('syncing', 'جاري المزامنة...');
+    let shouldRetry = true;
 
     try {
         const { doc, setDoc, deleteDoc } = window.firestoreHelpers;
@@ -4063,14 +4112,19 @@ async function processSyncQueue() {
         if (getSyncQueue().length === 0) showToast('تم رفع التغييرات المحفوظة للسحابة', 'success');
     } catch (err) {
         console.error('Sync error:', err);
-        updateConnectionStatus(isOnline ? 'online' : 'offline', isOnline ? 'متصل - المزامنة معلقة' : 'غير متصل - حفظ محلي');
+        const accessErrorMessage = getFirebaseAccessErrorMessage(err);
+        shouldRetry = !accessErrorMessage;
+        updateConnectionStatus(
+            accessErrorMessage ? 'error' : (isOnline ? 'online' : 'offline'),
+            accessErrorMessage ? 'صلاحيات السحابة تحتاج مراجعة' : (isOnline ? 'متصل - المزامنة معلقة' : 'غير متصل - حفظ محلي')
+        );
         if (isOnline && !hasShownSyncError) {
-            showToast('تعذرت المزامنة؛ ستتم المحاولة تلقائيًا عند عودة الاتصال', 'error');
+            showToast(accessErrorMessage || 'تعذرت المزامنة؛ ستتم المحاولة تلقائيًا عند عودة الاتصال', 'error');
             hasShownSyncError = true;
         }
     } finally {
         isSyncing = false;
-        if (isOnline && getSyncQueue().length > 0) {
+        if (shouldRetry && isOnline && getSyncQueue().length > 0) {
             setTimeout(processSyncQueue, 10000);
         }
     }
@@ -4243,6 +4297,7 @@ async function initialCloudLoad() {
         localStorage.setItem(STORAGE_KEYS.lastSync, new Date().toISOString());
         updateConnectionStatus('online', 'متصل أونلاين');
         updateQueueBadge();
+        hasShownSyncError = false;
         await processSyncQueue();
         if (getSyncQueue().length === 0) showToast('تم تحميل البيانات ومزامنتها', 'success');
 
@@ -4250,9 +4305,16 @@ async function initialCloudLoad() {
         setupFirebaseListeners();
     } catch (err) {
         console.error('Initial cloud load failed:', err);
-        updateConnectionStatus(isOnline ? 'online' : 'offline', isOnline ? 'متصل - تعذرت المزامنة' : 'غير متصل - حفظ محلي');
-        showToast('تعذر الوصول للسحابة؛ البيانات محفوظة محليًا وستتم إعادة المحاولة عند عودة الاتصال', 'error');
-        if (isOnline && firebaseReady) setTimeout(initialCloudLoad, 15000);
+        const accessErrorMessage = getFirebaseAccessErrorMessage(err);
+        updateConnectionStatus(
+            accessErrorMessage ? 'error' : (isOnline ? 'online' : 'offline'),
+            accessErrorMessage ? 'صلاحيات السحابة تحتاج مراجعة' : (isOnline ? 'متصل - تعذرت المزامنة' : 'غير متصل - حفظ محلي')
+        );
+        if (!hasShownSyncError) {
+            showToast(accessErrorMessage || 'تعذر الوصول للسحابة؛ البيانات محفوظة محليًا وستتم إعادة المحاولة عند عودة الاتصال', 'error');
+            hasShownSyncError = true;
+        }
+        if (!accessErrorMessage && isOnline && firebaseReady) setTimeout(initialCloudLoad, 15000);
     } finally {
         isInitialCloudLoading = false;
     }
@@ -4757,7 +4819,7 @@ function renderAttendance() {
 
     const tbody = document.getElementById('attendanceTable');
     if (filtered.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" class="empty-state">لا توجد سجلات حضور</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="10" class="empty-state">لا توجد سجلات حضور</td></tr>';
         return;
     }
 
@@ -4772,14 +4834,17 @@ function renderAttendance() {
     tbody.innerHTML = filtered.map((a, idx) => {
         const emp = appData.employees.find(e => e.id === a.employeeId);
         const hours = calcWorkHours(a.checkIn, a.checkOut);
+        const status = getAttendanceStatus(a);
+        const lateMinutes = getAttendanceLateMinutes(a);
         return `<tr>
             <td>${idx + 1}</td>
             <td>${formatDate(a.date)}</td>
             <td>${emp ? emp.name : '-'}</td>
             <td>${a.checkIn || '-'}</td>
             <td>${a.checkOut || '-'}</td>
-            <td>${a.status === 'حاضر' || a.status === 'تأخر' ? hours + ' ساعة' : '-'}</td>
-            <td><span class="status-badge ${statusClass[a.status] || ''}">${a.status}</span></td>
+            <td>${status === 'حاضر' || status === 'تأخر' ? hours + ' ساعة' : '-'}</td>
+            <td>${lateMinutes ? formatLateDuration(lateMinutes) : '-'}</td>
+            <td><span class="status-badge ${statusClass[status] || ''}">${status}</span></td>
             <td>${a.notes || '-'}</td>
             <td>
                 <button class="btn-edit" onclick="editAttendance('${a.id}')">✏️</button>
@@ -4923,9 +4988,13 @@ function renderEmployeeSheet() {
     const presentDays = empAttendance.filter(a => a.status === 'حاضر' || a.status === 'تأخر').length;
     const absentDays = empAttendance.filter(a => a.status === 'غائب').length;
     const leaveDays = empAttendance.filter(a => a.status === 'إجازة').length;
-    const lateDays = empAttendance.filter(a => a.status === 'تأخر').length;
+    const lateDays = empAttendance.filter(a => getAttendanceStatus(a) === 'تأخر').length;
+    const totalLateMinutes = empAttendance.reduce((sum, a) => {
+        return sum + (getAttendanceStatus(a) === 'تأخر' ? getAttendanceLateMinutes(a) : 0);
+    }, 0);
     const totalWorkHours = empAttendance.reduce((sum, a) => {
-        if (a.status === 'حاضر' || a.status === 'تأخر') return sum + Number(calcWorkHours(a.checkIn, a.checkOut));
+        const status = getAttendanceStatus(a);
+        if (status === 'حاضر' || status === 'تأخر') return sum + Number(calcWorkHours(a.checkIn, a.checkOut));
         return sum;
     }, 0);
 
@@ -4999,6 +5068,10 @@ function renderEmployeeSheet() {
                 <div class="mini-stat-value">${lateDays}</div>
             </div>
             <div class="mini-stat">
+                <div class="mini-stat-label">إجمالي مدة التأخر</div>
+                <div class="mini-stat-value">${formatLateDuration(totalLateMinutes)}</div>
+            </div>
+            <div class="mini-stat">
                 <div class="mini-stat-label">إجمالي ساعات العمل</div>
                 <div class="mini-stat-value">${totalWorkHours.toFixed(1)} س</div>
             </div>
@@ -5039,6 +5112,7 @@ function renderEmployeeSheet() {
                     <th>وقت الحضور</th>
                     <th>وقت الانصراف</th>
                     <th>ساعات العمل</th>
+                    <th>مدة التأخر</th>
                     <th>الحالة</th>
                     <th>ملاحظات</th>
                 </tr>
@@ -5046,7 +5120,8 @@ function renderEmployeeSheet() {
             <tbody>`;
         empAttendance.forEach((a, idx) => {
             const dayName = new Date(a.date).toLocaleDateString('ar-SA', { weekday: 'long' });
-            const hours = (a.status === 'حاضر' || a.status === 'تأخر') ? calcWorkHours(a.checkIn, a.checkOut) + ' ساعة' : '-';
+            const status = getAttendanceStatus(a);
+            const hours = (status === 'حاضر' || status === 'تأخر') ? calcWorkHours(a.checkIn, a.checkOut) + ' ساعة' : '-';
             html += `<tr>
                 <td>${idx + 1}</td>
                 <td>${formatDate(a.date)}</td>
@@ -5054,7 +5129,8 @@ function renderEmployeeSheet() {
                 <td>${a.checkIn || '-'}</td>
                 <td>${a.checkOut || '-'}</td>
                 <td>${hours}</td>
-                <td><span class="status-badge ${statusClass[a.status] || ''}">${a.status}</span></td>
+                <td>${getAttendanceLateMinutes(a) ? formatLateDuration(getAttendanceLateMinutes(a)) : '-'}</td>
+                <td><span class="status-badge ${statusClass[getAttendanceStatus(a)] || ''}">${getAttendanceStatus(a)}</span></td>
                 <td>${a.notes || '-'}</td>
             </tr>`;
         });
@@ -5589,7 +5665,7 @@ function exportEmployeesExcelSheets() {
             { v: 'أيام الحضور', bold: true, fontColor: COLORS.headerFg, align: 'center', bgColor: COLORS.headerBg },
             { v: 'أيام الغياب', bold: true, fontColor: COLORS.headerFg, align: 'center', bgColor: COLORS.headerBg },
             { v: 'أيام الإجازة', bold: true, fontColor: COLORS.headerFg, align: 'center', bgColor: COLORS.headerBg },
-            { v: 'التأخر', bold: true, fontColor: COLORS.headerFg, align: 'center', bgColor: COLORS.headerBg },
+            { v: 'مرات التأخر', bold: true, fontColor: COLORS.headerFg, align: 'center', bgColor: COLORS.headerBg },
             { v: 'ساعات العمل', bold: true, fontColor: COLORS.headerFg, align: 'center', bgColor: COLORS.headerBg }
         ]
     ];
@@ -5607,7 +5683,7 @@ function exportEmployeesExcelSheets() {
         const presentDays = empAtt.filter(a => a.status === 'حاضر' || a.status === 'تأخر').length;
         const absentDays = empAtt.filter(a => a.status === 'غائب').length;
         const leaveDays = empAtt.filter(a => a.status === 'إجازة').length;
-        const lateDays = empAtt.filter(a => a.status === 'تأخر').length;
+        const lateDays = empAtt.filter(a => getAttendanceStatus(a) === 'تأخر').length;
         const totalHours = empAtt.reduce((sum, a) => {
             if (a.status === 'حاضر' || a.status === 'تأخر') return sum + Number(calcWorkHours(a.checkIn, a.checkOut));
             return sum;
@@ -5631,7 +5707,7 @@ function exportEmployeesExcelSheets() {
             { v: presentDays, align: 'center', bgColor: rowBg, fontColor: '22543D' },
             { v: absentDays, align: 'center', bgColor: rowBg, fontColor: '742A2A' },
             { v: leaveDays, align: 'center', bgColor: rowBg, fontColor: '2A4365' },
-            { v: lateDays, align: 'center', bgColor: rowBg, fontColor: '7B341E' },
+            { v: lateDays, align: 'center', bgColor: COLORS.late, fontColor: '7B341E', bold: true },
             { v: Number(totalHours.toFixed(2)), align: 'center', bgColor: rowBg }
         ]);
     });
@@ -5698,15 +5774,15 @@ function exportEmployeesExcelSheets() {
         const daysRows = [
             [
                 { v: '👤 شيت الأيام - ' + (emp.name || '-'), bold: true, fontSize: 14, fontColor: COLORS.headerFg, align: 'center', bgColor: COLORS.headerBg },
-                '', '', '', '', '', '', ''
+                '', '', '', '', '', '', '', ''
             ],
             [
                 { v: 'الفترة من ' + startDate.toLocaleDateString('ar-EG') + ' إلى ' + endDate.toLocaleDateString('ar-EG'), fontSize: 11, fontColor: COLORS.headerFg, align: 'center', bgColor: COLORS.headerBg },
-                '', '', '', '', '', '', ''
+                '', '', '', '', '', '', '', ''
             ],
             [
                 { v: 'القسم: ' + (emp.department || '-') + ' | تاريخ التعيين: ' + (emp.hireDate || '-'), fontSize: 10, fontColor: COLORS.headerFg, align: 'center', bgColor: COLORS.headerBg },
-                '', '', '', '', '', '', ''
+                '', '', '', '', '', '', '', ''
             ],
             [],
             [
@@ -5716,32 +5792,39 @@ function exportEmployeesExcelSheets() {
                 { v: 'وقت الحضور', bold: true, fontColor: COLORS.headerFg, align: 'center', bgColor: COLORS.headerBg },
                 { v: 'وقت الانصراف', bold: true, fontColor: COLORS.headerFg, align: 'center', bgColor: COLORS.headerBg },
                 { v: 'ساعات العمل', bold: true, fontColor: COLORS.headerFg, align: 'center', bgColor: COLORS.headerBg },
+                { v: 'مدة التأخر', bold: true, fontColor: COLORS.headerFg, align: 'center', bgColor: COLORS.headerBg },
                 { v: 'الحالة', bold: true, fontColor: COLORS.headerFg, align: 'center', bgColor: COLORS.headerBg },
                 { v: 'ملاحظات', bold: true, fontColor: COLORS.headerFg, align: 'center', bgColor: COLORS.headerBg }
             ]
         ];
 
-        let totalPresentDays = 0, totalLateDays = 0, totalAbsentDays = 0, totalLeaveDays = 0, totalWorkHours = 0;
+        let totalPresentDays = 0, totalLateDays = 0, totalLateMinutes = 0, totalAbsentDays = 0, totalLeaveDays = 0, totalWorkHours = 0;
         const curDate = new Date(startDate);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const weekendDays = getAppSettings().weekendDays || [5, 6];
         let dayNum = 1;
         let dayRowIndex = 0;
         while (curDate <= endDate) {
-            const dateStr = curDate.toISOString().split('T')[0];
+            const dateStr = `${curDate.getFullYear()}-${String(curDate.getMonth() + 1).padStart(2, '0')}-${String(curDate.getDate()).padStart(2, '0')}`;
             const attRecord = empAtt.find(a => a.date === dateStr);
             const dayName = dayNamesAr[curDate.getDay()];
             const dayOfWeek = curDate.getDay();
-            const isWeekend = (dayOfWeek === 5 || dayOfWeek === 6);
+            const isWeekend = weekendDays.includes(dayOfWeek);
+            const isPastWorkday = curDate < today && !isWeekend;
 
             const rowBg = dayRowIndex % 2 === 0 ? COLORS.white : COLORS.altRow;
 
             if (attRecord) {
-                const hours = (attRecord.status === 'حاضر' || attRecord.status === 'تأخر')
+                const status = getAttendanceStatus(attRecord);
+                const lateMinutes = getAttendanceLateMinutes(attRecord);
+                const hours = (status === 'حاضر' || status === 'تأخر')
                     ? Number(calcWorkHours(attRecord.checkIn, attRecord.checkOut)) : '-';
-                if (attRecord.status === 'حاضر') { totalPresentDays++; if (typeof hours === 'number') totalWorkHours += hours; }
-                if (attRecord.status === 'تأخر') { totalLateDays++; if (typeof hours === 'number') totalWorkHours += hours; }
-                if (attRecord.status === 'غائب') totalAbsentDays++;
-                if (attRecord.status === 'إجازة') totalLeaveDays++;
-                const statusColor = statusBg(attRecord.status);
+                if (status === 'حاضر') { totalPresentDays++; if (typeof hours === 'number') totalWorkHours += hours; }
+                if (status === 'تأخر') { totalLateDays++; totalLateMinutes += lateMinutes; if (typeof hours === 'number') totalWorkHours += hours; }
+                if (status === 'غائب') totalAbsentDays++;
+                if (status === 'إجازة') totalLeaveDays++;
+                const statusColor = statusBg(status);
 
                 daysRows.push([
                     { v: dayNum, align: 'center', bgColor: rowBg },
@@ -5750,12 +5833,14 @@ function exportEmployeesExcelSheets() {
                     { v: attRecord.checkIn || '-', align: 'center', bgColor: rowBg },
                     { v: attRecord.checkOut || '-', align: 'center', bgColor: rowBg },
                     { v: hours, align: 'center', bgColor: rowBg },
-                    { v: attRecord.status, align: 'center', bold: true, bgColor: statusColor },
+                    { v: status === 'تأخر' ? formatLateDuration(lateMinutes) : '-', align: 'center', bold: status === 'تأخر', bgColor: status === 'تأخر' ? COLORS.late : rowBg, fontColor: status === 'تأخر' ? '7B341E' : '2D3748' },
+                    { v: status, align: 'center', bold: true, bgColor: statusColor },
                     { v: attRecord.notes || '-', bgColor: rowBg }
                 ]);
             } else {
-                const statusText = isWeekend ? 'إجازة أسبوعية' : 'لا يوجد سجل';
-                const statusColor = isWeekend ? COLORS.weekend : COLORS.noRecord;
+                if (isPastWorkday) totalAbsentDays++;
+                const statusText = isWeekend ? 'إجازة أسبوعية' : isPastWorkday ? 'غائب' : 'لا يوجد سجل';
+                const statusColor = isWeekend ? COLORS.weekend : isPastWorkday ? COLORS.absent : COLORS.noRecord;
                 daysRows.push([
                     { v: dayNum, align: 'center', bgColor: rowBg },
                     { v: dateStr, align: 'center', bgColor: rowBg },
@@ -5763,7 +5848,8 @@ function exportEmployeesExcelSheets() {
                     { v: '-', align: 'center', bgColor: rowBg, fontColor: 'A0AEC0' },
                     { v: '-', align: 'center', bgColor: rowBg, fontColor: 'A0AEC0' },
                     { v: '-', align: 'center', bgColor: rowBg, fontColor: 'A0AEC0' },
-                    { v: statusText, align: 'center', bgColor: statusColor, fontColor: '718096' },
+                    { v: '-', align: 'center', bgColor: rowBg, fontColor: 'A0AEC0' },
+                    { v: statusText, align: 'center', bold: isPastWorkday, bgColor: statusColor, fontColor: isPastWorkday ? '742A2A' : '718096' },
                     { v: '', bgColor: rowBg }
                 ]);
             }
@@ -5774,43 +5860,34 @@ function exportEmployeesExcelSheets() {
 
         daysRows.push([]);
         daysRows.push([
-            { v: '', bgColor: COLORS.summaryBg },
-            { v: '', bgColor: COLORS.summaryBg },
-            { v: '', bgColor: COLORS.summaryBg },
-            { v: '', bgColor: COLORS.summaryBg },
-            { v: '', bgColor: COLORS.summaryBg },
             { v: 'ملخص الحضور', bold: true, align: 'center', fontColor: COLORS.primary, bgColor: COLORS.totalRow },
             { v: 'القيمة', bold: true, align: 'center', fontColor: COLORS.primary, bgColor: COLORS.totalRow },
-            { v: '', bgColor: COLORS.totalRow }
+            { v: 'الوحدة', bold: true, align: 'center', fontColor: COLORS.primary, bgColor: COLORS.totalRow }
         ]);
         const summaryEntries = [
             ['أيام الحضور', totalPresentDays, 'يوم', '22543D'],
-            ['أيام التأخر', totalLateDays, 'يوم', '7B341E'],
+            ['مرات التأخر', totalLateDays, totalLateDays === 1 ? 'مرة' : 'مرات', '7B341E', COLORS.late],
+            ['إجمالي مدة التأخر', formatLateDuration(totalLateMinutes), '', '7B341E', COLORS.late],
             ['أيام الغياب', totalAbsentDays, 'يوم', '742A2A'],
             ['أيام الإجازة', totalLeaveDays, 'يوم', '2A4365'],
             ['إجمالي ساعات العمل', Number(totalWorkHours.toFixed(2)), 'ساعة', COLORS.primary]
         ];
-        summaryEntries.forEach(([label, val, unit, color]) => {
+        summaryEntries.forEach(([label, val, unit, color, valueBg]) => {
             daysRows.push([
-                { v: '', bgColor: COLORS.summaryBg },
-                { v: '', bgColor: COLORS.summaryBg },
-                { v: '', bgColor: COLORS.summaryBg },
-                { v: '', bgColor: COLORS.summaryBg },
-                { v: '', bgColor: COLORS.summaryBg },
                 { v: label, bold: true, align: 'center', fontColor: COLORS.primary, bgColor: COLORS.summaryBg },
-                { v: val, bold: true, align: 'center', fontColor: color, bgColor: COLORS.summaryBg },
+                { v: val, bold: true, align: 'center', fontColor: color, bgColor: valueBg || COLORS.summaryBg },
                 { v: unit, align: 'center', fontColor: '718096', bgColor: COLORS.summaryBg }
             ]);
         });
 
         const daysSheet = buildStyledSheet(daysRows, {
             cols: [
-                { wch: 6 }, { wch: 13 }, { wch: 12 }, { wch: 12 }, { wch: 14 }, { wch: 12 }, { wch: 16 }, { wch: 22 }
+                { wch: 6 }, { wch: 13 }, { wch: 12 }, { wch: 12 }, { wch: 14 }, { wch: 12 }, { wch: 18 }, { wch: 16 }, { wch: 22 }
             ],
             merges: [
-                { s: { r: 0, c: 0 }, e: { r: 0, c: 7 } },
-                { s: { r: 1, c: 0 }, e: { r: 1, c: 7 } },
-                { s: { r: 2, c: 0 }, e: { r: 2, c: 7 } }
+                { s: { r: 0, c: 0 }, e: { r: 0, c: 8 } },
+                { s: { r: 1, c: 0 }, e: { r: 1, c: 8 } },
+                { s: { r: 2, c: 0 }, e: { r: 2, c: 8 } }
             ]
         });
         const daysTabName = uniqueName(sanitizeSheetName((emp.name || ('موظف_' + (idx+1))) + ' - أيام', 'موظف_' + (idx+1) + ' - أيام'), usedNames);
@@ -7394,6 +7471,10 @@ function applyCompanyInfo() {
 function initApp() {
     initTheme();
     loadData();
+    const excelMonthFilter = document.getElementById('excelMonthFilter');
+    if (excelMonthFilter && !excelMonthFilter.value) {
+        excelMonthFilter.value = getCurrentMonth();
+    }
     applyCompanyInfo();
     setupMobileSidebar();
     setupNavigation();
