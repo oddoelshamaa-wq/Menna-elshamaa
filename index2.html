@@ -777,31 +777,175 @@
 
         /* ====== تجاوب ====== */
         @media (max-width: 768px) {
-            .portal-header { padding: 12px 14px; }
-            .portal-brand-text h1 { font-size: 17px; }
-            .portal-brand-text small { font-size: 9px; }
-            .portal-user-info { display: none; }
-            .portal-user { gap: 7px; }
-            .theme-settings summary, .btn-logout { padding: 7px 8px; font-size: 11px; }
-            .portal-content { padding: 16px 12px; }
+            body { background-attachment: scroll; }
+            .portal-header {
+                padding: 12px 14px;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            .portal-brand { flex: 1 1 100%; }
+            .portal-brand-text h1 { font-size: 18px; }
+            .portal-brand-text small { font-size: 10px; }
+            .portal-user {
+                width: 100%;
+                justify-content: space-between;
+                gap: 8px;
+            }
+            .portal-user-info {
+                display: block;
+                flex: 1;
+                min-width: 0;
+                text-align: right;
+            }
+            .portal-user-info strong,
+            .portal-user-info small {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            .portal-content { padding: 14px 12px; }
             .form-grid { grid-template-columns: 1fr; }
-            .portal-stats { grid-template-columns: 1fr 1fr; gap: 10px; }
-            .portal-stat { padding: 14px; }
-            .portal-stat-icon { width: 40px; height: 40px; font-size: 22px; }
-            .portal-stat-info h3 { font-size: 16px; }
-            .filter-bar { flex-direction: column; align-items: stretch; }
+            .portal-stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px;
+                margin-bottom: 16px;
+            }
+            .portal-stat {
+                min-width: 0;
+                padding: 12px;
+                gap: 8px;
+            }
+            .portal-stat-icon { flex: 0 0 38px; width: 38px; height: 38px; font-size: 20px; }
+            .portal-stat-info { min-width: 0; }
+            .portal-stat-info p { font-size: 11px; }
+            .portal-stat-info h3 { font-size: 17px; }
+            .filter-bar { flex-direction: column; align-items: stretch; gap: 10px; }
             .filter-group { width: 100%; }
             .filter-group input, .filter-group select { min-width: 0; width: 100%; }
-            .data-table { font-size: 12px; }
-            .data-table thead th, .data-table tbody td { padding: 8px 6px; }
-            .modal { max-width: 95vw; }
+            .table-wrapper { overflow: visible; }
+            .data-table,
+            .data-table tbody { display: block; width: 100%; }
+            .data-table thead { display: none; }
+            .data-table tbody tr {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+                gap: 0 12px;
+                margin: 12px;
+                padding: 8px 12px;
+                border: 1px solid var(--border);
+                border-right: 3px solid var(--accent);
+                border-radius: 10px;
+                background: var(--bg-card);
+                box-shadow: var(--shadow-sm);
+            }
+            .data-table tbody td {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 8px;
+                min-width: 0;
+                padding: 8px 0;
+                border-bottom: 1px solid var(--border);
+                overflow-wrap: anywhere;
+            }
+            .data-table tbody td::before {
+                flex: 0 0 auto;
+                color: var(--text-light);
+                font-size: 11px;
+                font-weight: 700;
+                content: "";
+            }
+            .data-table tbody td:nth-child(1) { display: none; }
+            .data-table tbody td:nth-child(2) { grid-column: 1 / -1; justify-content: center; }
+            .data-table tbody td:nth-child(2)::before { content: none; }
+            .data-table tbody td:nth-child(3)::before { content: "الاسم"; }
+            .data-table tbody td:nth-child(4)::before { content: "الهاتف"; }
+            .data-table tbody td:nth-child(5)::before { content: "نوع العقار"; }
+            .data-table tbody td:nth-child(6)::before { content: "المنطقة"; }
+            .data-table tbody td:nth-child(7)::before { content: "الميزانية"; }
+            .data-table tbody td:nth-child(8)::before { content: "الحالة"; }
+            .data-table tbody td:nth-child(9)::before { content: "التاريخ"; }
+            .data-table tbody td:nth-child(10) {
+                grid-column: 1 / -1;
+                justify-content: flex-start;
+                flex-wrap: wrap;
+                white-space: normal !important;
+                border-bottom: 0;
+            }
+            .data-table tbody td:nth-child(10)::before {
+                flex-basis: 100%;
+                content: "إجراءات";
+            }
+            .data-table tbody td.empty-state {
+                display: block;
+                grid-column: 1 / -1;
+                padding: 20px 8px;
+                text-align: center;
+            }
+            .data-table tbody td.empty-state::before { content: none; }
+            .btn-icon-sm {
+                min-width: 40px;
+                min-height: 40px;
+                margin: 2px;
+                font-size: 14px;
+            }
+            .btn-primary, .btn-secondary, .btn-logout, .theme-settings summary {
+                min-height: 42px;
+            }
+            .portal-card { margin-bottom: 16px; }
+            .portal-card-header { gap: 8px; padding: 13px 14px; }
+            .portal-card-header h2 { font-size: 15px; }
+            .portal-card-body { padding: 14px; }
+            .image-upload-area { padding: 20px 12px; }
+            .modal { max-width: 95vw; max-height: 85dvh; }
+            .modal-body { padding: 16px; }
+            .theme-panel {
+                position: fixed;
+                top: auto;
+                right: 12px;
+                bottom: 12px;
+                left: 12px;
+                width: auto;
+                max-height: min(70dvh, 420px);
+                overflow-y: auto;
+            }
             .toast { left: 12px !important; right: 12px !important; bottom: 12px !important; }
         }
 
         @media (max-width: 480px) {
-            .portal-stats { grid-template-columns: 1fr; }
+            .login-wrapper { padding: 14px; }
+            .login-card { padding: 30px 20px; }
+            .login-card h1 { font-size: 23px; }
+            .login-logo { font-size: 48px; }
+            .portal-header { padding: 10px 12px; }
             .portal-brand-icon { font-size: 26px; }
-            .portal-avatar { width: 36px; height: 36px; font-size: 15px; }
+            .portal-brand-text h1 { font-size: 16px; }
+            .portal-brand-text small { font-size: 9px; }
+            .portal-user { gap: 6px; }
+            .portal-user-info { font-size: 12px; }
+            .portal-user-info small { font-size: 10px; }
+            .portal-avatar { flex: 0 0 36px; width: 36px; height: 36px; font-size: 15px; }
+            .theme-settings summary, .btn-logout { padding: 7px 9px; font-size: 12px; }
+            .portal-content { padding: 12px 8px; }
+            .portal-stats { gap: 8px; }
+            .portal-stat { padding: 10px 8px; }
+            .portal-stat-icon { flex-basis: 32px; width: 32px; height: 32px; font-size: 17px; }
+            .portal-stat-info p { font-size: 10px; }
+            .portal-stat-info h3 { font-size: 15px; }
+            .data-table tbody tr { margin: 10px 8px; padding: 6px 10px; gap: 0 8px; }
+            .data-table tbody td { font-size: 12px; }
+            .data-table tbody td::before { font-size: 10px; }
+            .portal-card-body { padding: 12px; }
+            .form-grid { gap: 12px; }
+            .image-preview { max-height: 180px; }
+            .modal-footer { padding: 12px 16px; }
+        }
+
+        @media (max-width: 360px) {
+            .portal-user-info { display: none; }
+            .portal-stats { grid-template-columns: 1fr; }
+            .data-table tbody tr { grid-template-columns: 1fr; }
+            .data-table tbody td:nth-child(10) { grid-column: 1; }
         }
 
         /* ====== شاشة تحميل ====== */
