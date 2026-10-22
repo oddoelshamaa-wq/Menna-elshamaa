@@ -1390,6 +1390,65 @@
             return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
         }
 
+        function normalizePhone(phone) {
+            const digits = String(phone || '')
+                .replace(/[٠-٩۰-۹]/g, digit => {
+                    const code = digit.charCodeAt(0);
+                    return String(code >= 0x06f0 ? code - 0x06f0 : code - 0x0660);
+                })
+                .replace(/\D/g, '');
+
+            if (digits.startsWith('0020')) return digits.slice(2);
+            if (digits.startsWith('20') && digits.length === 12) return digits;
+            if (digits.startsWith('01') && digits.length === 11) return `20${digits.slice(1)}`;
+            return digits;
+        }
+
+        function getPhoneSearchValues(phone) {
+            const raw = String(phone || '').trim();
+            const normalized = normalizePhone(raw);
+            const values = new Set([raw, normalized]);
+            if (normalized.startsWith('20') && normalized.length === 12) {
+                values.add(`0${normalized.slice(2)}`);
+                values.add(`+${normalized}`);
+                values.add(`00${normalized}`);
+            }
+            return [...values].filter(Boolean);
+        }
+
+        async function findPhoneOwner(phone, excludedCustomerId) {
+            const normalizedPhone = normalizePhone(phone);
+            const localCustomers = JSON.parse(localStorage.getItem('sales_leads_local') || '[]');
+            const localOwner = localCustomers.find(customer =>
+                customer.id !== excludedCustomerId &&
+                normalizePhone(customer.phoneNormalized || customer.phone) === normalizedPhone
+            );
+            if (localOwner) return localOwner;
+
+            if (!window.fbDb || !window.fbHelpers) return null;
+
+            const { collection, getDocs, query, where } = window.fbHelpers;
+            const leads = collection(window.fbDb, 'sales_leads');
+            const queries = [
+                query(leads, where('phoneNormalized', '==', normalizedPhone)),
+                ...getPhoneSearchValues(phone).map(value => query(leads, where('phone', '==', value)))
+            ];
+            const snapshots = await Promise.all(queries.map(getDocs));
+
+            for (const snapshot of snapshots) {
+                let owner = null;
+                snapshot.forEach(doc => {
+                    if (owner || doc.id === excludedCustomerId) return;
+                    const customer = { id: doc.id, ...doc.data() };
+                    if (normalizePhone(customer.phoneNormalized || customer.phone) === normalizedPhone) {
+                        owner = customer;
+                    }
+                });
+                if (owner) return owner;
+            }
+            return null;
+        }
+
         // ====== نظام الجلسة ======
         function checkSession() {
             const session = localStorage.getItem(SESSION_KEY) || sessionStorage.getItem(SESSION_KEY);
@@ -2013,10 +2072,31 @@
                 return;
             }
             const id = document.getElementById('customerId').value;
+            const phone = document.getElementById('customerPhone').value.trim();
+
+            showLoader('جاري التحقق من رقم الهاتف...');
+            let phoneOwner;
+            try {
+                phoneOwner = await findPhoneOwner(phone, id || null);
+            } catch (err) {
+                console.error('Phone duplicate check failed:', err);
+                hideLoader();
+                showToast('تعذر التحقق من رقم الهاتف. تأكد من الاتصال بالإنترنت ثم حاول مرة أخرى.', 'error');
+                return;
+            }
+
+            if (phoneOwner) {
+                hideLoader();
+                const employeeName = phoneOwner.employeeName || phoneOwner.username || 'موظف آخر';
+                showToast(`رقم الهاتف مسجل بالفعل عند الموظف ${employeeName}`, 'error');
+                document.getElementById('customerPhone').focus();
+                return;
+            }
 
             const data = {
                 name: document.getElementById('customerName').value.trim(),
-                phone: document.getElementById('customerPhone').value.trim(),
+                phone,
+                phoneNormalized: normalizePhone(phone),
                 propertyType: document.getElementById('customerPropertyType').value,
                 area: document.getElementById('customerArea').value.trim(),
                 budget: Number(document.getElementById('customerBudget').value) || 0,
