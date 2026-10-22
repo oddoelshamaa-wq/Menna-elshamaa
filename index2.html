@@ -1,0 +1,1954 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بوابة موظفي المبيعات - طيبة</title>
+    <style>
+        :root {
+            --primary: #1a2942;
+            --primary-light: color-mix(in srgb, var(--primary) 78%, white);
+            --accent: #c9a961;
+            --accent-light: color-mix(in srgb, var(--accent) 78%, white);
+            --bg: #f4f1ea;
+            --bg-card: #ffffff;
+            --text: #2d3748;
+            --text-light: #718096;
+            --border: #e2e8f0;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+            --success: #38a169;
+            --danger: #e53e3e;
+            --warning: #d69e2e;
+            --info: #3182ce;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', 'Tajawal', sans-serif;
+            background: var(--bg);
+            background-image:
+                radial-gradient(ellipse at 8% 12%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 34%),
+                radial-gradient(ellipse at 92% 82%, color-mix(in srgb, var(--primary) 9%, transparent), transparent 38%),
+                repeating-linear-gradient(135deg, transparent 0 42px, color-mix(in srgb, var(--primary) 2%, transparent) 42px 43px);
+            background-attachment: fixed;
+            color: var(--text);
+            min-height: 100vh;
+            direction: rtl;
+        }
+
+        /* ====== شاشة تسجيل الدخول ====== */
+        .login-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+        }
+
+        .login-card {
+            background: var(--bg-card);
+            padding: 40px 32px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+        }
+
+        .login-logo {
+            font-size: 56px;
+            margin-bottom: 12px;
+        }
+
+        .login-card h1 {
+            color: var(--primary);
+            font-size: 26px;
+            margin-bottom: 6px;
+            font-weight: 900;
+        }
+
+        .login-card .sub {
+            color: var(--accent);
+            font-size: 13px;
+            letter-spacing: 1px;
+            margin-bottom: 28px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .login-form .form-group {
+            margin-bottom: 18px;
+            text-align: right;
+        }
+
+        .login-form label {
+            display: block;
+            font-size: 13px;
+            color: var(--text);
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .login-form input,
+        .login-form select {
+            width: 100%;
+            padding: 13px 16px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 15px;
+            background: var(--bg);
+            color: var(--text);
+            transition: all 0.2s;
+        }
+
+        .login-form input:focus,
+        .login-form select:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: var(--bg-card);
+            box-shadow: 0 0 0 3px rgba(201, 169, 97, 0.15);
+        }
+
+        .theme-settings {
+            position: relative;
+            color: var(--text);
+            font-size: 13px;
+        }
+
+        .theme-settings summary {
+            list-style: none;
+            cursor: pointer;
+            color: #fff;
+            padding: 8px 10px;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 8px;
+            white-space: nowrap;
+        }
+
+        .theme-settings summary::-webkit-details-marker { display: none; }
+
+        .theme-panel {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            z-index: 60;
+            width: 240px;
+            padding: 14px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .theme-color-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .theme-color-row input {
+            width: 42px;
+            height: 32px;
+            padding: 2px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--bg-card);
+            cursor: pointer;
+        }
+
+        .login-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            color: var(--primary);
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: all 0.2s;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(201, 169, 97, 0.4);
+        }
+
+        .login-btn:active { transform: translateY(0); }
+
+        .login-error {
+            background: #fed7d7;
+            color: #742a2a;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        .login-error.show { display: block; }
+
+        .login-footer {
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        .login-footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* ====== شريط علوي للبوابة ====== */
+        .portal-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: #fff;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .portal-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .portal-brand-icon { font-size: 32px; }
+
+        .portal-brand-text h1 {
+            font-size: 20px;
+            color: var(--accent);
+            font-weight: 900;
+            margin: 0;
+        }
+
+        .portal-brand-text small {
+            font-size: 11px;
+            color: rgba(255,255,255,0.6);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .portal-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .portal-user-info {
+            text-align: left;
+        }
+
+        .portal-user-info strong {
+            display: block;
+            font-size: 14px;
+            color: #fff;
+        }
+
+        .portal-user-info small {
+            display: block;
+            font-size: 11px;
+            color: rgba(255,255,255,0.6);
+        }
+
+        .portal-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 18px;
+        }
+
+        .btn-logout {
+            background: rgba(229, 62, 62, 0.2);
+            border: 1px solid rgba(229, 62, 62, 0.4);
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-logout:hover {
+            background: rgba(229, 62, 62, 0.35);
+        }
+
+        /* ====== المحتوى ====== */
+        .portal-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px 20px;
+        }
+
+        .portal-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .portal-stat {
+            background: var(--bg-card);
+            padding: 18px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            border-right: 4px solid var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .portal-stat-icon {
+            font-size: 28px;
+            width: 50px;
+            height: 50px;
+            background: var(--bg);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .portal-stat-info p {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-bottom: 4px;
+        }
+
+        .portal-stat-info h3 {
+            font-size: 20px;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        /* ====== بطاقات القسم ====== */
+        .portal-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+
+        .portal-card-header {
+            background: var(--bg);
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .portal-card-header h2 {
+            color: var(--primary);
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        .portal-card-body {
+            padding: 20px;
+        }
+
+        /* ====== الأزرار ====== */
+        .btn-primary, .btn-secondary {
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-light);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background: var(--bg-card);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover { background: var(--bg); }
+
+        .btn-icon-sm {
+            background: var(--info);
+            color: #fff;
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 600;
+            margin: 0 2px;
+        }
+
+        .btn-icon-sm.danger {
+            background: var(--danger);
+        }
+
+        /* ====== الفورم ====== */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group.full-width { grid-column: 1 / -1; }
+
+        .form-group label {
+            font-size: 13px;
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 14px;
+            background: var(--bg-card);
+            color: var(--text);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(201, 169, 97, 0.15);
+        }
+
+        .form-group small {
+            font-size: 11px;
+            color: var(--text-light);
+        }
+
+        /* ====== رفع الصورة ====== */
+        .image-upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 10px;
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--bg);
+        }
+
+        .image-upload-area:hover {
+            border-color: var(--accent);
+            background: rgba(201, 169, 97, 0.05);
+        }
+
+        .image-upload-area.has-image {
+            padding: 12px;
+            border-style: solid;
+            border-color: var(--success);
+        }
+
+        .image-upload-icon {
+            font-size: 36px;
+            margin-bottom: 8px;
+        }
+
+        .image-upload-text {
+            color: var(--text-light);
+            font-size: 13px;
+        }
+
+        .image-upload-text strong {
+            color: var(--primary);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .image-preview {
+            max-width: 100%;
+            max-height: 220px;
+            border-radius: 8px;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .image-preview.show { display: block; }
+
+        .image-remove {
+            background: var(--danger);
+            color: #fff;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .image-remove.show { display: inline-block; }
+
+        /* ====== الجدول ====== */
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 8px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .data-table thead th {
+            background: var(--primary);
+            color: #fff;
+            padding: 12px 10px;
+            text-align: right;
+            font-weight: 600;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .data-table tbody tr {
+            border-bottom: 1px solid var(--border);
+            transition: background 0.15s;
+        }
+
+        .data-table tbody tr:hover { background: var(--bg); }
+
+        .data-table tbody td {
+            padding: 12px 10px;
+            color: var(--text);
+        }
+
+        .data-table tbody td.empty-state {
+            text-align: center;
+            padding: 32px;
+            color: var(--text-light);
+            font-style: italic;
+        }
+
+        .customer-thumb {
+            width: 50px;
+            height: 50px;
+            border-radius: 6px;
+            object-fit: cover;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            transition: transform 0.2s;
+        }
+
+        .customer-thumb:hover {
+            transform: scale(1.1);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-new { background: #bee3f8; color: #2a4365; }
+        .status-contacted { background: #feebc8; color: #7b341e; }
+        .status-reserved { background: #c6f6d5; color: #22543d; }
+        .status-cancelled { background: #fed7d7; color: #742a2a; }
+
+        /* ====== نافذة منبثقة ====== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .modal {
+            background: var(--bg-card);
+            border-radius: 12px;
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+            display: none;
+        }
+
+        .modal.active { display: block; }
+
+        .modal-header {
+            background: var(--primary);
+            color: #fff;
+            padding: 14px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .modal-header h3 {
+            font-size: 17px;
+            color: var(--accent);
+        }
+
+        .close-btn {
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 26px;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .close-btn:hover { color: var(--accent); }
+
+        .modal-body { padding: 20px; }
+
+        .modal-footer {
+            padding: 16px 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-start;
+            gap: 10px;
+        }
+
+        /* ====== Toast ====== */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--primary);
+            color: #fff;
+            padding: 14px 22px;
+            border-radius: 8px;
+            box-shadow: var(--shadow-lg);
+            transform: translateY(12px);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: transform 0.3s, opacity 0.3s, visibility 0.3s;
+            z-index: 1000;
+            font-size: 14px;
+            border-right: 4px solid var(--accent);
+            max-width: 90vw;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+        .toast.success { border-right-color: var(--success); }
+        .toast.error { border-right-color: var(--danger); }
+        .toast.info { border-right-color: var(--info); }
+
+        /* ====== عارض الصور ====== */
+        .image-viewer {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            cursor: pointer;
+        }
+
+        .image-viewer.active { display: flex; }
+
+        .image-viewer img {
+            max-width: 95%;
+            max-height: 95vh;
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+        }
+
+        .image-viewer-close {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255,255,255,0.15);
+            border: none;
+            color: #fff;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        /* ====== فلتر ====== */
+        .filter-bar {
+            background: var(--bg-card);
+            padding: 14px 18px;
+            border-radius: 10px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            gap: 14px;
+            align-items: flex-end;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .filter-group label {
+            font-size: 12px;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        .filter-group input,
+        .filter-group select {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 14px;
+            background: var(--bg-card);
+            color: var(--text);
+            min-width: 160px;
+        }
+
+        /* ====== تجاوب ====== */
+        @media (max-width: 768px) {
+            .portal-header { padding: 12px 14px; }
+            .portal-brand-text h1 { font-size: 17px; }
+            .portal-brand-text small { font-size: 9px; }
+            .portal-user-info { display: none; }
+            .portal-user { gap: 7px; }
+            .theme-settings summary, .btn-logout { padding: 7px 8px; font-size: 11px; }
+            .portal-content { padding: 16px 12px; }
+            .form-grid { grid-template-columns: 1fr; }
+            .portal-stats { grid-template-columns: 1fr 1fr; gap: 10px; }
+            .portal-stat { padding: 14px; }
+            .portal-stat-icon { width: 40px; height: 40px; font-size: 22px; }
+            .portal-stat-info h3 { font-size: 16px; }
+            .filter-bar { flex-direction: column; align-items: stretch; }
+            .filter-group { width: 100%; }
+            .filter-group input, .filter-group select { min-width: 0; width: 100%; }
+            .data-table { font-size: 12px; }
+            .data-table thead th, .data-table tbody td { padding: 8px 6px; }
+            .modal { max-width: 95vw; }
+            .toast { left: 12px !important; right: 12px !important; bottom: 12px !important; }
+        }
+
+        @media (max-width: 480px) {
+            .portal-stats { grid-template-columns: 1fr; }
+            .portal-brand-icon { font-size: 26px; }
+            .portal-avatar { width: 36px; height: 36px; font-size: 15px; }
+        }
+
+        /* ====== شاشة تحميل ====== */
+        .loader-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(255,255,255,0.8);
+            z-index: 999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .loader-overlay.active { display: flex; }
+
+        .loader-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loader-text {
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 14px;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- ====== شاشة تسجيل الدخول ====== -->
+    <div class="login-wrapper" id="loginScreen">
+        <div class="login-card">
+            <div class="login-logo">🏢</div>
+            <h1>طيبة العقارية</h1>
+            <p class="sub">Menaa Elshamaa - Sales Portal</p>
+
+            <div class="login-error" id="loginError"></div>
+
+            <form class="login-form" id="loginForm" onsubmit="doLogin(event)">
+                <div class="form-group">
+                    <label>اسم المستخدم</label>
+                    <select id="loginUsername" required autocomplete="username" onchange="document.getElementById('loginPassword').focus()">
+                        <option value="">جاري تحميل أسماء الموظفين...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>كلمة المرور</label>
+                    <input type="password" id="loginPassword" required autocomplete="current-password" placeholder="أدخل كلمة المرور">
+                </div>
+                <button type="submit" class="login-btn">🔐 تسجيل الدخول</button>
+            </form>
+
+            <div class="login-footer">
+                <p>تم إنشاء حسابك من قبل الإدارة؟</p>
+                <p style="margin-top:6px;"><a href="index.html">العودة للموقع الرئيسي ←</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ====== شاشة البوابة (تظهر بعد الدخول) ====== -->
+    <div id="portalScreen" style="display:none;">
+        <!-- شريط علوي -->
+        <header class="portal-header">
+            <div class="portal-brand">
+                <span class="portal-brand-icon">🏢</span>
+                <div class="portal-brand-text">
+                    <h1>طيبة العقارية</h1>
+                    <small>بوابة موظفي المبيعات</small>
+                </div>
+            </div>
+            <div class="portal-user">
+                <div class="portal-user-info">
+                    <strong id="userName">-</strong>
+                    <small id="userDepartment">-</small>
+                </div>
+                <div class="portal-avatar" id="userAvatar">-</div>
+                <details class="theme-settings">
+                    <summary>🎨 الألوان</summary>
+                    <div class="theme-panel">
+                        <label class="theme-color-row">
+                            <span>اللون الرئيسي</span>
+                            <input type="color" id="primaryColorPicker" value="#1a2942" aria-label="اللون الرئيسي">
+                        </label>
+                        <label class="theme-color-row">
+                            <span>اللون المميز</span>
+                            <input type="color" id="accentColorPicker" value="#c9a961" aria-label="اللون المميز">
+                        </label>
+                        <label class="theme-color-row">
+                            <span>خلفية الصفحة</span>
+                            <input type="color" id="backgroundColorPicker" value="#f4f1ea" aria-label="خلفية الصفحة">
+                        </label>
+                        <label class="theme-color-row">
+                            <span>لون البطاقات</span>
+                            <input type="color" id="cardColorPicker" value="#ffffff" aria-label="لون البطاقات">
+                        </label>
+                        <label class="theme-color-row">
+                            <span>لون النصوص</span>
+                            <input type="color" id="textColorPicker" value="#2d3748" aria-label="لون النصوص">
+                        </label>
+                        <button type="button" class="btn-secondary" onclick="resetTheme()">استعادة الألوان الافتراضية</button>
+                    </div>
+                </details>
+                <button class="btn-logout" onclick="doLogout()">🚪 خروج</button>
+            </div>
+        </header>
+
+        <!-- المحتوى -->
+        <main class="portal-content">
+            <!-- إحصائيات -->
+            <div class="portal-stats">
+                <div class="portal-stat">
+                    <div class="portal-stat-icon">📋</div>
+                    <div class="portal-stat-info">
+                        <p>إجمالي العملاء</p>
+                        <h3 id="statTotal">0</h3>
+                    </div>
+                </div>
+                <div class="portal-stat">
+                    <div class="portal-stat-icon">🆕</div>
+                    <div class="portal-stat-info">
+                        <p>عملاء جدد</p>
+                        <h3 id="statNew">0</h3>
+                    </div>
+                </div>
+                <div class="portal-stat">
+                    <div class="portal-stat-icon">📞</div>
+                    <div class="portal-stat-info">
+                        <p>تم التواصل</p>
+                        <h3 id="statContacted">0</h3>
+                    </div>
+                </div>
+                <div class="portal-stat">
+                    <div class="portal-stat-icon">✅</div>
+                    <div class="portal-stat-info">
+                        <p>تم الحجز</p>
+                        <h3 id="statReserved">0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- فورم إضافة عميل -->
+            <div class="portal-card">
+                <div class="portal-card-header">
+                    <h2 id="formTitle">➕ إضافة عميل جديد</h2>
+                    <button class="btn-secondary" onclick="resetForm()" id="cancelEditBtn" style="display:none;">إلغاء التعديل</button>
+                </div>
+                <div class="portal-card-body">
+                    <form id="customerForm" onsubmit="saveCustomer(event)">
+                        <input type="hidden" id="customerId">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>اسم العميل *</label>
+                                <input type="text" id="customerName" required placeholder="الاسم الكامل">
+                            </div>
+                            <div class="form-group">
+                                <label>رقم الهاتف *</label>
+                                <input type="tel" id="customerPhone" required placeholder="01xxxxxxxxx">
+                            </div>
+                            <div class="form-group">
+                                <label>نوع العقار المهتم به</label>
+                                <select id="customerPropertyType">
+                                    <option value="أرض">أرض</option>
+                                    <option value="فيلا">فيلا</option>
+                                    <option value="شقة">شقة</option>
+                                    <option value="محل">محل</option>
+                                    <option value="عمارة">عمارة</option>
+                                    <option value="أخرى">أخرى</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>المنطقة المفضلة</label>
+                                <input type="text" id="customerArea" placeholder="الحي / المدينة">
+                            </div>
+                            <div class="form-group">
+                                <label>الميزانية المتوقعة (ج.م)</label>
+                                <input type="number" id="customerBudget" min="0" placeholder="0">
+                            </div>
+                            <div class="form-group">
+                                <label>حالة العميل</label>
+                                <select id="customerStatus">
+                                    <option value="new">🆕 عميل جديد</option>
+                                    <option value="contacted">📞 تم التواصل</option>
+                                    <option value="reserved">✅ تم الحجز</option>
+                                    <option value="cancelled">❌ تم الإلغاء</option>
+                                </select>
+                            </div>
+                            <div class="form-group full-width">
+                                <label>تفاصيل إضافية</label>
+                                <textarea id="customerNotes" rows="3" placeholder="ملاحظات عن العميل، متطلباته، مواعيد الاتصال..."></textarea>
+                            </div>
+                            <div class="form-group full-width">
+                                <label>📷 لقطة شاشة / صورة (اختياري)</label>
+                                <div class="image-upload-area" id="uploadArea" onclick="document.getElementById('customerImage').click()">
+                                    <div class="image-upload-icon">📸</div>
+                                    <div class="image-upload-text">
+                                        <strong>اضغط لرفع صورة</strong>
+                                        يمكن رفع سكرين شوت من محادثة العميل أو صورة الموقع
+                                        <br><small>(JPG, PNG, WEBP - حتى 5 ميجا)</small>
+                                    </div>
+                                </div>
+                                <input type="file" id="customerImage" accept="image/*" style="display:none" onchange="handleImageUpload(event)">
+                                <img class="image-preview" id="imagePreview">
+                                <button type="button" class="image-remove" id="imageRemoveBtn" onclick="removeImage()">🗑️ حذف الصورة</button>
+                            </div>
+                        </div>
+                        <div style="margin-top: 18px; display: flex; gap: 10px;">
+                            <button type="submit" class="btn-primary" id="submitBtn">💾 حفظ العميل</button>
+                            <button type="button" class="btn-secondary" onclick="resetForm()">↺ تفريغ الفورم</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- فلتر -->
+            <div class="filter-bar">
+                <div class="filter-group">
+                    <label>بحث</label>
+                    <input type="search" id="searchInput" placeholder="اسم، هاتف، منطقة..." oninput="renderCustomers()">
+                </div>
+                <div class="filter-group">
+                    <label>الحالة</label>
+                    <select id="statusFilter" onchange="renderCustomers()">
+                        <option value="">كل الحالات</option>
+                        <option value="new">🆕 عميل جديد</option>
+                        <option value="contacted">📞 تم التواصل</option>
+                        <option value="reserved">✅ تم الحجز</option>
+                        <option value="cancelled">❌ تم الإلغاء</option>
+                    </select>
+                </div>
+                <button class="btn-secondary" onclick="resetFilter()">↺ إعادة تعيين</button>
+            </div>
+
+            <!-- جدول العملاء -->
+            <div class="portal-card">
+                <div class="portal-card-header">
+                    <h2>📋 عملائي المسجلين</h2>
+                    <span style="color: var(--text-light); font-size: 13px;" id="customersCount">0 عميل</span>
+                </div>
+                <div class="portal-card-body" style="padding: 0;">
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>الصورة</th>
+                                    <th>الاسم</th>
+                                    <th>الهاتف</th>
+                                    <th>نوع العقار</th>
+                                    <th>المنطقة</th>
+                                    <th>الميزانية</th>
+                                    <th>الحالة</th>
+                                    <th>التاريخ</th>
+                                    <th>إجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="customersTable">
+                                <tr><td colspan="10" class="empty-state">لا يوجد عملاء بعد</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- نافذة عرض التفاصيل -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal" id="viewModal">
+            <div class="modal-header">
+                <h3>📋 تفاصيل العميل</h3>
+                <button class="close-btn" onclick="closeModal('viewModal')">×</button>
+            </div>
+            <div class="modal-body" id="viewModalBody"></div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('viewModal')">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- عارض الصور -->
+    <div class="image-viewer" id="imageViewer" onclick="closeImageViewer()">
+        <button class="image-viewer-close">×</button>
+        <img id="imageViewerImg" src="">
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Loader -->
+    <div class="loader-overlay" id="loader">
+        <div class="loader-spinner"></div>
+        <div class="loader-text" id="loaderText">جاري التحميل...</div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, collection, doc, setDoc, deleteDoc, getDocs, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCbkOQP-rzoyUSqMfSWD1RVxJyLFZhjoYg",
+            authDomain: "meena-elshamaa.firebaseapp.com",
+            projectId: "meena-elshamaa",
+            storageBucket: "meena-elshamaa.firebasestorage.app",
+            messagingSenderId: "221507612617",
+            appId: "1:221507612617:web:4cad710b09c1fb839fc218",
+            measurementId: "G-ML6W2T7LKF"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.fbDb = db;
+        window.fbHelpers = { collection, doc, setDoc, deleteDoc, getDocs, query, where, onSnapshot };
+        window.dispatchEvent(new Event('fbReady'));
+    </script>
+
+    <script>
+        // ====== المتغيرات العامة ======
+        const SESSION_KEY = 'sales_portal_session';
+        const THEME_STORAGE_KEY = 'sales_portal_theme_';
+        const DEFAULT_THEME = {
+            primary: '#1a2942',
+            accent: '#c9a961',
+            background: '#f4f1ea',
+            card: '#ffffff',
+            text: '#2d3748'
+        };
+        let currentUser = null;
+        let customers = [];
+        let currentImageData = null;
+        let unsubscribeListener = null;
+        let employeeOptions = [];
+
+        // ====== أدوات مساعدة ======
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast ' + type + ' show';
+            clearTimeout(toast._timer);
+            toast._timer = setTimeout(() => toast.classList.remove('show'), type === 'error' ? 5000 : 3000);
+        }
+
+        function showLoader(text = 'جاري التحميل...') {
+            document.getElementById('loaderText').textContent = text;
+            document.getElementById('loader').classList.add('active');
+        }
+
+        function hideLoader() {
+            document.getElementById('loader').classList.remove('active');
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            const d = new Date(dateStr);
+            return d.toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric' });
+        }
+
+        function formatCurrency(num) {
+            if (!num) return '-';
+            return new Intl.NumberFormat('ar-EG').format(num) + ' ج.م';
+        }
+
+        function genId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+        }
+
+        // ====== نظام الجلسة ======
+        function checkSession() {
+            const session = localStorage.getItem(SESSION_KEY) || sessionStorage.getItem(SESSION_KEY);
+            if (session) {
+                try {
+                    currentUser = JSON.parse(session);
+                    return true;
+                } catch (e) {
+                    localStorage.removeItem(SESSION_KEY);
+                    sessionStorage.removeItem(SESSION_KEY);
+                }
+            }
+            return false;
+        }
+
+        function saveSession(user, remember) {
+            const data = JSON.stringify(user);
+            if (remember) {
+                localStorage.setItem(SESSION_KEY, data);
+            } else {
+                sessionStorage.setItem(SESSION_KEY, data);
+            }
+        }
+
+        function clearSession() {
+            localStorage.removeItem(SESSION_KEY);
+            sessionStorage.removeItem(SESSION_KEY);
+            currentUser = null;
+        }
+
+        function addEmployeeOption(value, name, department) {
+            if (!value || !name) return;
+            const existingOption = employeeOptions.find(option => option.value === value);
+            if (existingOption) {
+                existingOption.name = name;
+                existingOption.department = department || existingOption.department;
+                return;
+            }
+            employeeOptions.push({ value, name, department: department || 'المبيعات' });
+        }
+
+        function renderEmployeeOptions() {
+            const select = document.getElementById('loginUsername');
+            const selectedValue = select.value;
+            select.replaceChildren(new Option('اختر اسمك', ''));
+            employeeOptions.forEach(employee => {
+                const option = new Option(employee.name, employee.value);
+                select.add(option);
+            });
+            if (employeeOptions.some(option => option.value === selectedValue)) {
+                select.value = selectedValue;
+            }
+            if (employeeOptions.length === 0) {
+                select.replaceChildren(new Option('لا توجد أسماء متاحة - تواصل مع الإدارة', ''));
+            }
+        }
+
+        function loadLocalEmployeeOptions() {
+            const localAccounts = JSON.parse(localStorage.getItem('sales_accounts_local') || '[]');
+            localAccounts
+                .filter(account => account.active !== false)
+                .forEach(account => {
+                    addEmployeeOption(
+                        `account:${account.username}`,
+                        account.employeeName || account.username,
+                        account.department
+                    );
+                });
+            renderEmployeeOptions();
+        }
+
+        async function loadEmployeeOptions() {
+            loadLocalEmployeeOptions();
+            if (!window.fbDb || !window.fbHelpers) return;
+
+            try {
+                const { collection, getDocs } = window.fbHelpers;
+                const [accountsSnapshot, employeesSnapshot] = await Promise.all([
+                    getDocs(collection(window.fbDb, 'sales_accounts')),
+                    getDocs(collection(window.fbDb, 'employees'))
+                ]);
+                const employees = new Map();
+                employeesSnapshot.forEach(doc => employees.set(doc.id, doc.data()));
+                const activeAccounts = [];
+                accountsSnapshot.forEach(doc => {
+                    const account = doc.data();
+                    if (account.active !== false && account.username) {
+                        const employee = account.employeeId ? employees.get(account.employeeId) : null;
+                        activeAccounts.push({
+                            username: account.username,
+                            name: employee?.name || account.employeeName || account.username,
+                            department: employee?.department || account.department || 'المبيعات'
+                        });
+                    }
+                });
+                employeeOptions = [];
+                activeAccounts.forEach(account => addEmployeeOption(
+                    `account:${account.username}`,
+                    account.name,
+                    account.department
+                ));
+                renderEmployeeOptions();
+            } catch (err) {
+                console.error('Unable to load employee names:', err);
+                const errorEl = document.getElementById('loginError');
+                errorEl.textContent = 'تعذر تحميل أسماء الموظفين من قاعدة البيانات. تحقق من الاتصال أو تواصل مع الإدارة.';
+                errorEl.classList.add('show');
+            }
+        }
+
+        // ====== تسجيل الدخول ======
+        async function doLogin(event) {
+            event.preventDefault();
+            const select = document.getElementById('loginUsername');
+            const selection = select.value;
+            const username = selection.startsWith('account:') ? selection.slice('account:'.length) : '';
+            const password = document.getElementById('loginPassword').value;
+            const errorEl = document.getElementById('loginError');
+
+            if (!selection || !password) {
+                errorEl.textContent = 'من فضلك اختر اسمك وأدخل كلمة المرور';
+                errorEl.classList.add('show');
+                return;
+            }
+
+            showLoader('جاري التحقق من البيانات...');
+            errorEl.classList.remove('show');
+
+            try {
+                // محاولة Firebase أولاً
+                if (window.fbDb && window.fbHelpers) {
+                    const { collection, query, where, getDocs } = window.fbHelpers;
+                    // استعلام بسيط على username فقط (لتجنب الحاجة لـ composite index)
+                    const q = query(
+                        collection(window.fbDb, 'sales_accounts'),
+                        where('username', '==', username)
+                    );
+                    const snapshot = await getDocs(q);
+
+                    if (!snapshot.empty) {
+                        // التحقق من كلمة المرور والحالة في الكود
+                        let account = null;
+                        let accountDocId = null;
+                        snapshot.forEach(doc => {
+                            const data = doc.data();
+                            if (data.password === password && data.active !== false) {
+                                account = data;
+                                accountDocId = doc.id;
+                            }
+                        });
+
+                        if (account) {
+
+                        // التحقق من ربط الموظف
+                        let employeeName = account.employeeName || account.username;
+                        let department = account.department || 'المبيعات';
+
+                        if (account.employeeId) {
+                            try {
+                                const empSnap = await getDocs(collection(window.fbDb, 'employees'));
+                                empSnap.forEach(d => {
+                                    if (d.id === account.employeeId) {
+                                        const emp = d.data();
+                                        employeeName = emp.name || employeeName;
+                                        department = emp.department || department;
+                                    }
+                                });
+                            } catch (e) { /* ignore */ }
+                        }
+
+                        currentUser = {
+                            id: accountDocId,
+                            username: account.username,
+                            employeeId: account.employeeId || null,
+                            employeeName: employeeName,
+                            department: department,
+                            loginAt: Date.now()
+                        };
+
+                        saveSession(currentUser, true);
+                        hideLoader();
+                        showPortal();
+                        return;
+                    }
+                    } // end if (account)
+                } // end if (!snapshot.empty)
+            } catch (err) {
+                console.error('Login error:', err);
+            }
+
+            // محاولة من التخزين المحلي (احتياط)
+            const localAccounts = JSON.parse(localStorage.getItem('sales_accounts_local') || '[]');
+            const localAccount = localAccounts.find(a =>
+                a.username === username && a.password === password && a.active !== false
+            );
+
+            if (localAccount) {
+                currentUser = {
+                    id: localAccount.id,
+                    username: localAccount.username,
+                    employeeId: localAccount.employeeId || null,
+                    employeeName: localAccount.employeeName || localAccount.username,
+                    department: localAccount.department || 'المبيعات',
+                    loginAt: Date.now()
+                };
+                saveSession(currentUser, true);
+                hideLoader();
+                showPortal();
+                return;
+            }
+
+            hideLoader();
+            errorEl.textContent = '❌ اسم المستخدم أو كلمة المرور غير صحيحة، أو الحساب غير مفعل';
+            errorEl.classList.add('show');
+        }
+
+        function doLogout() {
+            if (!confirm('هل تريد تسجيل الخروج؟')) return;
+            if (unsubscribeListener) {
+                unsubscribeListener();
+                unsubscribeListener = null;
+            }
+            clearSession();
+            document.getElementById('portalScreen').style.display = 'none';
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('loginForm').reset();
+        }
+
+        // ====== عرض البوابة ======
+        function showPortal() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('portalScreen').style.display = 'block';
+            loadTheme();
+
+            // عرض بيانات المستخدم
+            document.getElementById('userName').textContent = currentUser.employeeName || currentUser.username;
+            document.getElementById('userDepartment').textContent = currentUser.department || 'المبيعات';
+            document.getElementById('userAvatar').textContent = (currentUser.employeeName || currentUser.username).charAt(0);
+
+            // تحميل العملاء
+            loadCustomers();
+        }
+
+        function applyTheme(theme) {
+            const colors = {
+                primary: /^#[0-9a-f]{6}$/i.test(theme.primary) ? theme.primary : DEFAULT_THEME.primary,
+                accent: /^#[0-9a-f]{6}$/i.test(theme.accent) ? theme.accent : DEFAULT_THEME.accent,
+                background: /^#[0-9a-f]{6}$/i.test(theme.background) ? theme.background : DEFAULT_THEME.background,
+                card: /^#[0-9a-f]{6}$/i.test(theme.card) ? theme.card : DEFAULT_THEME.card,
+                text: /^#[0-9a-f]{6}$/i.test(theme.text) ? theme.text : DEFAULT_THEME.text
+            };
+            document.documentElement.style.setProperty('--primary', colors.primary);
+            document.documentElement.style.setProperty('--accent', colors.accent);
+            document.documentElement.style.setProperty('--bg', colors.background);
+            document.documentElement.style.setProperty('--bg-card', colors.card);
+            document.documentElement.style.setProperty('--text', colors.text);
+            document.getElementById('primaryColorPicker').value = colors.primary;
+            document.getElementById('accentColorPicker').value = colors.accent;
+            document.getElementById('backgroundColorPicker').value = colors.background;
+            document.getElementById('cardColorPicker').value = colors.card;
+            document.getElementById('textColorPicker').value = colors.text;
+        }
+
+        function saveTheme() {
+            if (!currentUser) return;
+            const theme = {
+                primary: document.getElementById('primaryColorPicker').value,
+                accent: document.getElementById('accentColorPicker').value,
+                background: document.getElementById('backgroundColorPicker').value,
+                card: document.getElementById('cardColorPicker').value,
+                text: document.getElementById('textColorPicker').value
+            };
+            applyTheme(theme);
+            localStorage.setItem(THEME_STORAGE_KEY + currentUser.id, JSON.stringify(theme));
+        }
+
+        function loadTheme() {
+            const storageKey = THEME_STORAGE_KEY + currentUser.id;
+            const savedTheme = localStorage.getItem(storageKey);
+            if (!savedTheme) {
+                applyTheme(DEFAULT_THEME);
+                return;
+            }
+            try {
+                applyTheme(JSON.parse(savedTheme));
+            } catch (err) {
+                console.error('Unable to load saved theme:', err);
+                localStorage.removeItem(storageKey);
+                applyTheme(DEFAULT_THEME);
+                showToast('تعذر تحميل الألوان المحفوظة، تمت استعادة الألوان الافتراضية', 'error');
+            }
+        }
+
+        function resetTheme() {
+            if (!currentUser) return;
+            localStorage.removeItem(THEME_STORAGE_KEY + currentUser.id);
+            applyTheme(DEFAULT_THEME);
+        }
+
+        // ====== تحميل العملاء ======
+        async function loadCustomers() {
+            showLoader('جاري تحميل العملاء...');
+
+            try {
+                if (window.fbDb && window.fbHelpers) {
+                    const { collection, query, where, onSnapshot } = window.fbHelpers;
+
+                    // الاستماع للتغييرات اللحظية
+                    const q = query(
+                        collection(window.fbDb, 'sales_leads'),
+                        where('account_id', '==', currentUser.id)
+                    );
+
+                    if (unsubscribeListener) unsubscribeListener();
+                    unsubscribeListener = onSnapshot(q, (snapshot) => {
+                        customers = [];
+                        snapshot.forEach(doc => {
+                            customers.push({ id: doc.id, ...doc.data() });
+                        });
+                        // دمج مع العملاء المحليين
+                        mergeLocalCustomers();
+                        customers.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+                        renderCustomers();
+                        updateStats();
+                        hideLoader();
+                    }, (err) => {
+                        console.warn('Firebase listener error:', err);
+                        loadLocalCustomers();
+                        hideLoader();
+                    });
+                } else {
+                    loadLocalCustomers();
+                    hideLoader();
+                }
+            } catch (err) {
+                console.error('Load customers error:', err);
+                loadLocalCustomers();
+                hideLoader();
+            }
+        }
+
+        function loadLocalCustomers() {
+            const local = JSON.parse(localStorage.getItem('sales_leads_local') || '[]');
+            customers = local.filter(c => c.account_id === currentUser.id);
+            customers.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+            renderCustomers();
+            updateStats();
+        }
+
+        function mergeLocalCustomers() {
+            const local = JSON.parse(localStorage.getItem('sales_leads_local') || '[]');
+            const remoteIds = new Set(customers.map(c => c.id));
+            local.forEach(localC => {
+                if (localC.account_id === currentUser.id && !remoteIds.has(localC.id)) {
+                    customers.push(localC);
+                }
+            });
+        }
+
+        function saveLocalCustomers() {
+            // حفظ العملاء المحليين (للعملاء الجدد الذين لم يُرفعوا بعد)
+            const local = JSON.parse(localStorage.getItem('sales_leads_local') || '[]');
+            // دمج القوائم
+            const allCustomers = [...local];
+            customers.forEach(c => {
+                if (!allCustomers.find(x => x.id === c.id)) {
+                    allCustomers.push(c);
+                }
+            });
+            localStorage.setItem('sales_leads_local', JSON.stringify(allCustomers));
+        }
+
+        // ====== عرض العملاء ======
+        function renderCustomers() {
+            const tbody = document.getElementById('customersTable');
+            const search = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+            const statusFilter = document.getElementById('statusFilter').value;
+
+            let filtered = [...customers];
+
+            if (search) {
+                filtered = filtered.filter(c =>
+                    (c.name || '').toLowerCase().includes(search) ||
+                    (c.phone || '').toLowerCase().includes(search) ||
+                    (c.area || '').toLowerCase().includes(search) ||
+                    (c.propertyType || '').toLowerCase().includes(search)
+                );
+            }
+
+            if (statusFilter) {
+                filtered = filtered.filter(c => c.status === statusFilter);
+            }
+
+            document.getElementById('customersCount').textContent = `${filtered.length} عميل`;
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" class="empty-state">لا يوجد عملاء مطابقين</td></tr>';
+                return;
+            }
+
+            const statusLabels = {
+                'new': { cls: 'status-new', text: '🆕 جديد' },
+                'contacted': { cls: 'status-contacted', text: '📞 تم التواصل' },
+                'reserved': { cls: 'status-reserved', text: '✅ تم الحجز' },
+                'cancelled': { cls: 'status-cancelled', text: '❌ ملغي' }
+            };
+
+            tbody.innerHTML = filtered.map((c, idx) => {
+                const status = statusLabels[c.status] || statusLabels.new;
+                const imageCell = c.imageData
+                    ? `<img src="${c.imageData}" class="customer-thumb" onclick="openImageViewer('${c.id}')" alt="صورة">`
+                    : '<span style="color:var(--text-light);">لا يوجد</span>';
+
+                return `<tr>
+                    <td>${idx + 1}</td>
+                    <td>${imageCell}</td>
+                    <td><strong>${c.name || '-'}</strong></td>
+                    <td><a href="tel:${c.phone}" style="color:var(--info);text-decoration:none;">${c.phone || '-'}</a></td>
+                    <td>${c.propertyType || '-'}</td>
+                    <td>${c.area || '-'}</td>
+                    <td>${c.budget ? formatCurrency(c.budget) : '-'}</td>
+                    <td><span class="status-badge ${status.cls}">${status.text}</span></td>
+                    <td>${formatDate(c.createdAt ? new Date(c.createdAt).toISOString().split('T')[0] : null)}</td>
+                    <td style="white-space:nowrap;">
+                        <button class="btn-icon-sm" onclick="viewCustomer('${c.id}')" title="عرض">👁️</button>
+                        <button class="btn-icon-sm" onclick="editCustomer('${c.id}')" title="تعديل">✏️</button>
+                        <button class="btn-icon-sm" onclick="callCustomer('${c.id}')" title="اتصال">📞</button>
+                        <button class="btn-icon-sm" onclick="shareCustomer('${c.id}')" title="مشاركة">📤</button>
+                        <button class="btn-icon-sm danger" onclick="deleteCustomer('${c.id}')" title="حذف">🗑️</button>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        function updateStats() {
+            document.getElementById('statTotal').textContent = customers.length;
+            document.getElementById('statNew').textContent = customers.filter(c => c.status === 'new').length;
+            document.getElementById('statContacted').textContent = customers.filter(c => c.status === 'contacted').length;
+            document.getElementById('statReserved').textContent = customers.filter(c => c.status === 'reserved').length;
+        }
+
+        function resetFilter() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('statusFilter').value = '';
+            renderCustomers();
+        }
+
+        // ====== رفع الصورة ======
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.size > 5 * 1024 * 1024) {
+                showToast('حجم الصورة يجب ألا يتجاوز 5 ميجا', 'error');
+                event.target.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                currentImageData = e.target.result;
+                const preview = document.getElementById('imagePreview');
+                preview.src = currentImageData;
+                preview.classList.add('show');
+                document.getElementById('imageRemoveBtn').classList.add('show');
+                document.getElementById('uploadArea').classList.add('has-image');
+                document.getElementById('uploadArea').innerHTML = `
+                    <div class="image-upload-icon">✅</div>
+                    <div class="image-upload-text"><strong>تم رفع الصورة</strong>${file.name}</div>
+                `;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removeImage() {
+            currentImageData = null;
+            document.getElementById('customerImage').value = '';
+            const preview = document.getElementById('imagePreview');
+            preview.src = '';
+            preview.classList.remove('show');
+            document.getElementById('imageRemoveBtn').classList.remove('show');
+            document.getElementById('uploadArea').classList.remove('has-image');
+            document.getElementById('uploadArea').innerHTML = `
+                <div class="image-upload-icon">📸</div>
+                <div class="image-upload-text">
+                    <strong>اضغط لرفع صورة</strong>
+                    يمكن رفع سكرين شوت من محادثة العميل أو صورة الموقع
+                    <br><small>(JPG, PNG, WEBP - حتى 5 ميجا)</small>
+                </div>
+            `;
+        }
+
+        // ====== حفظ العميل ======
+        async function saveCustomer(event) {
+            event.preventDefault();
+            const id = document.getElementById('customerId').value;
+
+            const data = {
+                name: document.getElementById('customerName').value.trim(),
+                phone: document.getElementById('customerPhone').value.trim(),
+                propertyType: document.getElementById('customerPropertyType').value,
+                area: document.getElementById('customerArea').value.trim(),
+                budget: Number(document.getElementById('customerBudget').value) || 0,
+                status: document.getElementById('customerStatus').value,
+                notes: document.getElementById('customerNotes').value.trim(),
+                imageData: currentImageData,
+                account_id: currentUser.id,
+                employeeName: currentUser.employeeName,
+                employeeId: currentUser.employeeId || null,
+                updatedAt: Date.now()
+            };
+
+            if (id) {
+                // تعديل
+                const existing = customers.find(c => c.id === id);
+                if (existing) {
+                    Object.assign(existing, data);
+                    data.createdAt = existing.createdAt;
+                }
+                data.id = id;
+            } else {
+                // إضافة
+                data.id = genId();
+                data.createdAt = Date.now();
+                customers.unshift(data);
+            }
+
+            showLoader('جاري الحفظ...');
+
+            // حفظ محلي أولاً
+            saveLocalCustomers();
+
+            // رفع لـ Firebase
+            try {
+                if (window.fbDb && window.fbHelpers) {
+                    const { doc, setDoc } = window.fbHelpers;
+                    await setDoc(doc(window.fbDb, 'sales_leads', data.id), data);
+                }
+            } catch (err) {
+                console.error('Firebase save error:', err);
+                showToast('تم الحفظ محلياً، سيتم رفعه عند توفر الاتصال', 'info');
+            }
+
+            hideLoader();
+            resetForm();
+            renderCustomers();
+            updateStats();
+            showToast(id ? 'تم تحديث بيانات العميل' : 'تمت إضافة العميل بنجاح');
+        }
+
+        function editCustomer(id) {
+            const c = customers.find(x => x.id === id);
+            if (!c) return;
+
+            document.getElementById('customerId').value = c.id;
+            document.getElementById('customerName').value = c.name || '';
+            document.getElementById('customerPhone').value = c.phone || '';
+            document.getElementById('customerPropertyType').value = c.propertyType || 'أرض';
+            document.getElementById('customerArea').value = c.area || '';
+            document.getElementById('customerBudget').value = c.budget || '';
+            document.getElementById('customerStatus').value = c.status || 'new';
+            document.getElementById('customerNotes').value = c.notes || '';
+
+            if (c.imageData) {
+                currentImageData = c.imageData;
+                const preview = document.getElementById('imagePreview');
+                preview.src = c.imageData;
+                preview.classList.add('show');
+                document.getElementById('imageRemoveBtn').classList.add('show');
+                document.getElementById('uploadArea').classList.add('has-image');
+                document.getElementById('uploadArea').innerHTML = `
+                    <div class="image-upload-icon">✅</div>
+                    <div class="image-upload-text"><strong>الصورة الحالية</strong>اضغط لتغييرها</div>
+                `;
+            } else {
+                removeImage();
+            }
+
+            document.getElementById('formTitle').textContent = '✏️ تعديل بيانات العميل';
+            document.getElementById('submitBtn').textContent = '💾 تحديث البيانات';
+            document.getElementById('cancelEditBtn').style.display = 'inline-flex';
+
+            // التمرير للأعلى
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.getElementById('customerName').focus();
+        }
+
+        function resetForm() {
+            document.getElementById('customerForm').reset();
+            document.getElementById('customerId').value = '';
+            currentImageData = null;
+            removeImage();
+            document.getElementById('formTitle').textContent = '➕ إضافة عميل جديد';
+            document.getElementById('submitBtn').textContent = '💾 حفظ العميل';
+            document.getElementById('cancelEditBtn').style.display = 'none';
+        }
+
+        // ====== عرض التفاصيل ======
+        function viewCustomer(id) {
+            const c = customers.find(x => x.id === id);
+            if (!c) return;
+
+            const statusLabels = {
+                'new': '🆕 عميل جديد',
+                'contacted': '📞 تم التواصل',
+                'reserved': '✅ تم الحجز',
+                'cancelled': '❌ تم الإلغاء'
+            };
+
+            let html = `
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+                    <div style="padding:12px;background:var(--bg);border-radius:8px;">
+                        <small style="color:var(--text-light);">الاسم</small>
+                        <strong style="display:block;color:var(--primary);font-size:16px;">${c.name || '-'}</strong>
+                    </div>
+                    <div style="padding:12px;background:var(--bg);border-radius:8px;">
+                        <small style="color:var(--text-light);">الهاتف</small>
+                        <strong style="display:block;color:var(--info);font-size:16px;"><a href="tel:${c.phone}" style="color:inherit;text-decoration:none;">${c.phone || '-'}</a></strong>
+                    </div>
+                    <div style="padding:12px;background:var(--bg);border-radius:8px;">
+                        <small style="color:var(--text-light);">نوع العقار</small>
+                        <strong style="display:block;color:var(--primary);">${c.propertyType || '-'}</strong>
+                    </div>
+                    <div style="padding:12px;background:var(--bg);border-radius:8px;">
+                        <small style="color:var(--text-light);">المنطقة</small>
+                        <strong style="display:block;color:var(--primary);">${c.area || '-'}</strong>
+                    </div>
+                    <div style="padding:12px;background:var(--bg);border-radius:8px;">
+                        <small style="color:var(--text-light);">الميزانية</small>
+                        <strong style="display:block;color:var(--primary);">${c.budget ? formatCurrency(c.budget) : '-'}</strong>
+                    </div>
+                    <div style="padding:12px;background:var(--bg);border-radius:8px;">
+                        <small style="color:var(--text-light);">الحالة</small>
+                        <strong style="display:block;color:var(--primary);">${statusLabels[c.status] || statusLabels.new}</strong>
+                    </div>
+                    <div style="padding:12px;background:var(--bg);border-radius:8px;grid-column:1/-1;">
+                        <small style="color:var(--text-light);">تاريخ الإضافة</small>
+                        <strong style="display:block;color:var(--primary);">${c.createdAt ? new Date(c.createdAt).toLocaleString('ar-EG') : '-'}</strong>
+                    </div>
+                </div>
+            `;
+
+            if (c.notes) {
+                html += `
+                    <div style="padding:14px;background:var(--bg);border-radius:8px;margin-bottom:14px;border-right:4px solid var(--accent);">
+                        <small style="color:var(--text-light);font-weight:600;">📝 ملاحظات</small>
+                        <p style="margin-top:6px;line-height:1.7;color:var(--text);">${c.notes}</p>
+                    </div>
+                `;
+            }
+
+            if (c.imageData) {
+                html += `
+                    <div style="margin-top:14px;">
+                        <small style="color:var(--text-light);font-weight:600;display:block;margin-bottom:8px;">📷 الصورة المرفقة</small>
+                        <img src="${c.imageData}" style="max-width:100%;border-radius:8px;cursor:pointer;" onclick="openImageViewer('${c.id}')">
+                    </div>
+                `;
+            }
+
+            document.getElementById('viewModalBody').innerHTML = html;
+            openModal('viewModal');
+        }
+
+        function callCustomer(id) {
+            const c = customers.find(x => x.id === id);
+            if (c && c.phone) {
+                window.location.href = `tel:${c.phone}`;
+            }
+        }
+
+        async function shareCustomer(id) {
+            const c = customers.find(x => x.id === id);
+            if (!c) return;
+            const text = `📋 بيانات العميل\nالاسم: ${c.name}\nالهاتف: ${c.phone}\nنوع العقار: ${c.propertyType || '-'}\nالمنطقة: ${c.area || '-'}`;
+            if (navigator.share) {
+                try {
+                    await navigator.share({ title: 'بيانات عميل', text });
+                } catch (e) { /* ignore */ }
+            } else {
+                navigator.clipboard.writeText(text);
+                showToast('تم نسخ بيانات العميل', 'success');
+            }
+        }
+
+        async function deleteCustomer(id) {
+            const c = customers.find(x => x.id === id);
+            if (!c) return;
+            if (!confirm(`⚠️ هل تريد حذف العميل "${c.name}" نهائياً؟`)) return;
+
+            customers = customers.filter(x => x.id !== id);
+            saveLocalCustomers();
+
+            try {
+                if (window.fbDb && window.fbHelpers) {
+                    const { doc, deleteDoc } = window.fbHelpers;
+                    await deleteDoc(doc(window.fbDb, 'sales_leads', id));
+                }
+            } catch (err) {
+                console.error('Delete error:', err);
+            }
+
+            renderCustomers();
+            updateStats();
+            showToast('تم حذف العميل', 'success');
+        }
+
+        // ====== عارض الصور ======
+        function openImageViewer(customerId) {
+            const c = customers.find(x => x.id === customerId);
+            if (!c || !c.imageData) return;
+            document.getElementById('imageViewerImg').src = c.imageData;
+            document.getElementById('imageViewer').classList.add('active');
+        }
+
+        function closeImageViewer() {
+            document.getElementById('imageViewer').classList.remove('active');
+        }
+
+        // ====== النوافذ ======
+        function openModal(id) {
+            document.getElementById('modalOverlay').classList.add('active');
+            document.getElementById(id).classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById('modalOverlay').classList.remove('active');
+            document.getElementById(id).classList.remove('active');
+        }
+
+        document.getElementById('modalOverlay').addEventListener('click', (e) => {
+            if (e.target.id === 'modalOverlay') {
+                document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
+                e.target.classList.remove('active');
+            }
+        });
+
+        document.getElementById('primaryColorPicker').addEventListener('input', saveTheme);
+        document.getElementById('accentColorPicker').addEventListener('input', saveTheme);
+        document.getElementById('backgroundColorPicker').addEventListener('input', saveTheme);
+        document.getElementById('cardColorPicker').addEventListener('input', saveTheme);
+        document.getElementById('textColorPicker').addEventListener('input', saveTheme);
+
+        // ====== التهيئة ======
+        window.addEventListener('fbReady', () => {
+            loadEmployeeOptions();
+            init();
+        });
+
+        // تهيئة فورية إذا كان Firebase جاهزاً
+        if (window.fbDb) init();
+
+        function init() {
+            loadLocalEmployeeOptions();
+            if (checkSession()) {
+                showPortal();
+            } else {
+                document.getElementById('loginScreen').style.display = 'flex';
+                document.getElementById('portalScreen').style.display = 'none';
+            }
+        }
+
+        // إغلاق عارض الصور بزر Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeImageViewer();
+                document.querySelectorAll('.modal.active').forEach(m => m.classList.remove('active'));
+                document.getElementById('modalOverlay').classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>
